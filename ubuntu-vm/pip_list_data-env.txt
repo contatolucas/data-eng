@@ -1,0 +1,5 @@
+Flask
+Scrapy
+scrapyrt
+pymongo
+apache-airflow
