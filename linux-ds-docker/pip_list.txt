@@ -1,3 +1,2 @@
-Flask
-Scrapy
-scrapyrt
+awscli
+boto3
