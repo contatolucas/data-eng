@@ -1,4 +1,4 @@
-FROM apache/airflow
+FROM puckel/docker-airflow
 
 ENV PATH /opt/spark/bin:$PATH
 #ENV PATH /opt/jdk/bin:/opt/spark/bin:$PATH
