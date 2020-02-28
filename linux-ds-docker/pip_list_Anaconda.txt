@@ -1,2 +1,0 @@
-awscli
-boto3
