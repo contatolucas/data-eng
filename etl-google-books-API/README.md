@@ -46,7 +46,7 @@ $ python etl_gbooksAPI.py
 ```
 
 ### Bônus base agregada
-Criação da base agregada com os principais campos para análise (executar no client de Banco de Dados escolhido, já logado na instância PostreSQL no RDS):
+Criação da base agregada com os principais campos para análise (executar no client de Banco de Dados escolhido, já logado na instância PostgreSQL no RDS):
 
 ```sql
 CREATE TABLE tb_gbooks_aggregated AS (
