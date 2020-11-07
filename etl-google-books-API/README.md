@@ -44,3 +44,18 @@ Para executar o arquivo, abra o Shell/CMD e navegue até a pasta do projeto (cas
 ```sh
 $ python etl_gbooksAPI.py
 ```
+
+### Bônus base agregada
+Criação da base agregada com os principais campos para análise (executar no client de Banco de Dados escolhido, já logado na instância PostreSQL no RDS):
+
+```sql
+CREATE TABLE tb_gbooks_aggregated AS (
+SELECT ano_publicacao, categoria, disponivel_venda, disponivel_epub, disponivel_pdf,
+sum(numero_paginas) as soma_numero_paginas, avg(numero_paginas) as media_numero_paginas,
+sum(preco) as soma_preco, avg(preco) as media_preco 
+FROM db_gbooks.public.tb_gbooks_curated
+GROUP BY ano_publicacao, categoria, disponivel_venda, disponivel_epub, disponivel_pdf
+);
+```
+
+Essa tabela pode ser usada também  ferramentas de visualização (Power BI, Tableau, Metabase, etc) ou para utilização em ferramentas de Ciência de Dados (como Jupyter Notebook, Google Colab, etc), contudo por ser agregada e possuir menos registros, torna-se mais performática.
