@@ -12,7 +12,7 @@ O processo apresentado aqui trata a extração de livros conforme termo/condiç�
 - Criar uma conta na AWS (caso ainda não tenha): https://aws.amazon.com/pt/;
 - Definir chaves de acesso no IAM Management na AWS (`ACCESS_KEY` e `SECRET_KEY`) e setar nas respectivas variáveis do arquivo **[etl_gbooksAPI](https://github.com/contatolucas/data-eng/blob/master/etl-google-books-API/etl_gbooksAPI.py)**;
 - Criar um bucket no AWS S3 que será o Data Lake do projeto e setar na variável `bucket` do arquivo **[etl_gbooksAPI](https://github.com/contatolucas/data-eng/blob/master/etl-google-books-API/etl_gbooksAPI.py)**;
-- Criar uma instância PostgreSQL no AWS RDS (que permita conexão pública) que será o Banco de Dados/Data Mart do projeto e setar as configurações em `postgres_engine` do arquivo **[arquivoPY](http://)**;
+- Criar uma instância PostgreSQL no AWS RDS (que permita conexão pública) que será o Banco de Dados/Data Mart do projeto e setar as configurações em `postgres_engine` do arquivo **[etl_gbooksAPI](https://github.com/contatolucas/data-eng/blob/master/etl-google-books-API/etl_gbooksAPI.py)**;
 - Criar uma API Key (**[Criar chave de API](https://cloud.google.com/docs/authentication/api-keys?visit_id=637403001827530704-1456085297&rd=1#creating_an_api_key)**) <br>
 *os recursos da AWS utilizados aqui, contemplam o nível gratuito
 
