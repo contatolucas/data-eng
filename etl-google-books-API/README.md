@@ -58,4 +58,4 @@ GROUP BY ano_publicacao, categoria, disponivel_venda, disponivel_epub, disponive
 );
 ```
 
-Essa tabela pode ser usada também  ferramentas de visualização (Power BI, Tableau, Metabase, etc) ou para utilização em ferramentas de Ciência de Dados (como Jupyter Notebook, Google Colab, etc), contudo por ser agregada e possuir menos registros, torna-se mais performática.
+Essa tabela pode ser usada também em ferramentas de visualização (Power BI, Tableau, Metabase, etc) ou para utilização em ferramentas de Ciência de Dados (como Jupyter Notebook, Google Colab, etc), contudo por ser agregada e possuir menos registros, torna-se mais performática.
