@@ -18,7 +18,7 @@ O processo apresentado aqui trata a extração de livros conforme termo/condiç�
 
 
 #### Iniciando
-Após definir e configurar os recursos acima na AWS, abra um client de Banco de Dados (DBeaver, pgAdmin, por exemplo), configure a conexão de acesso a instância PostgreSQL no RDS e rode as queries a seguir (também disponíveis no arquivo **[etl_gbooksAPI](https://github.com/contatolucas/data-eng/blob/master/etl-google-books-API/etl_gbooksAPI.py)**):
+Após definir e configurar os recursos acima na AWS, abra um client de Banco de Dados (DBeaver, pgAdmin, por exemplo), configure a conexão de acesso a instância PostgreSQL no RDS e rode as queries a seguir (também disponíveis no arquivo **[config_inicial_db](https://github.com/contatolucas/data-eng/blob/master/etl-google-books-API/config_inicial_db.sql)**):
 ```sql
 -- cria usuario/role e atribui acesso admin ao mesmo
 CREATE ROLE user_etl WITH PASSWORD 'etl@2020' CREATEDB CREATEROLE LOGIN;
