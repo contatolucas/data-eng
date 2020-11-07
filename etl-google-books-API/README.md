@@ -1,22 +1,24 @@
-# PROCESSO ETL (E T L) - GOOGLE BOOKS API
+# EXTRAÇÃO E CARGA DE DADOS DE LIVROS - GOOGLE BOOKS API
 
-Processo de extração, tratamento e carga de volumes (livros) da **[Google Books API](https://developers.google.com/books)**.
+Processo de extração, tratamento e carga de volumes (livros) dO **[Google Books API](https://developers.google.com/books)**.
 
 O processo apresentado aqui trata a extração de livros conforme termo/condições de pesquisa (**[Mais detalhes aqui](https://developers.google.com/books/docs/v1/using#query-params)**).
 
-Link dos dados abertos do Governo do Brasil: http://dados.gov.br/dataset/microdados-prova-brasil 
-
 #### Antes de começar:
+- Requisitos:
+    - Python 3.7+ (preferencialmente instalar a distribuição Anaconda Python 4.7+)
+        - awswrangler
+        - boto3
 - Criar uma conta na AWS (caso ainda não tenha): https://aws.amazon.com/pt/;
 - Definir chaves de acesso no IAM Management na AWS (`ACCESS_KEY` e `SECRET_KEY`) e setar nas respectivas variáveis do arquivo **[arquivoPY](http://)**;
-- Criar um bucket no AWS S3 e setar na variável `bucket` do arquivo **[arquivoPY](http://)**;
-- Criar uma instância PostgreSQL no AWS RDS (que permita conexão pública) para setar as configurações em `postgres_engine` do arquivo **[arquivoPY](http://)**;
-- Criar uma API Key (**[Criar chave de API](https://cloud.google.com/docs/authentication/api-keys?visit_id=637403001827530704-1456085297&rd=1#creating_an_api_key)**)
+- Criar um bucket no AWS S3 que será o Data Lake do projeto e setar na variável `bucket` do arquivo **[arquivoPY](http://)**
+- Criar uma instância PostgreSQL no AWS RDS (que permita conexão pública) que será o Banco de Dados/Data Mart do projeto e setar as configurações em `postgres_engine` do arquivo **[arquivoPY](http://)**;
+- Criar uma API Key (**[Criar chave de API](https://cloud.google.com/docs/authentication/api-keys?visit_id=637403001827530704-1456085297&rd=1#creating_an_api_key)**) <br>
 *os recursos da AWS utilizados aqui, contemplam o nível gratuito
 
 
 #### Iniciando
-Após definir e configurar os recursos acima na AWS, abra um client de Banco de Dados (DBeaver, pgAdmin, por exemplo), configure a conexão de acesso a instância PostgreSQL no RDS e rode as queryes a seguir (também disponíveis no arquivo **[arquivoSQL](http://)**):
+Após definir e configurar os recursos acima na AWS, abra um client de Banco de Dados (DBeaver, pgAdmin, por exemplo), configure a conexão de acesso a instância PostgreSQL no RDS e rode as queries a seguir (também disponíveis no arquivo **[arquivoSQL](http://)**):
 ```sql
 -- cria usuario/role e atribui acesso admin ao mesmo
 CREATE ROLE user_etl WITH PASSWORD 'etl@2020' CREATEDB CREATEROLE LOGIN;
@@ -26,38 +28,19 @@ GRANT rds_superuser TO user_etl;
 CREATE DATABASE db_gbooks OWNER user_etl TABLESPACE default;
 ```
 
-
-O Airflow foi escolhido para orquestrar a pipeline de dados por ser flexível e permitir organizar os passos com facilidades, caso necessite de escolabilidade pode facilmente incoporar outros frameworks de processamento distribuido. 
-O Redshift é totalmente gerenciado e oferece uma solução completa para montar o DataWarehouse. 
-O S3 permite armazenar os dados e carregar através dele as tabelas do Redshift, se tornando uma stagging area.
-E o Metabase é uma solução de visualização de dados open source com recursos fáceis e eficientes para montar dashboards.
+### Executar ETL/ELT
+O arquivo principal do projeto **[arquivoPY](http://)** executará todo o processo de ETL/ELT consumindo os dados da API do Google Books, tratamento e carga no Data Lake (bucket do S3) e no Bando de Dados/Data Mart (PostreSQL no RDS). <br>
+Principais pontos do arquivo:
+- setar a condição/termo de busca na API em:
+```py3
+pesquisa = 'inpublisher:Saraiva+Educação'
+```
+- consumo dos volumes (livros) da API pela classe `extrair_gbooksAPI()` com retorno em JSON paginado (40 em 40 volumes) guardando o resultado (em loop) em pandas `DataFrame` para utilização posterior durante a execução; <br><br>
+- após a extração completa conforme a condição/termo buscado, são iniciados os processos de transformações e cargas:
+    - no Data Lake são armazenados as etapas de transformação comumente utilizadas - raw data, standard data e curated data - onde temos os dados brutos (sem qualquer tratamento prévio), padronização inicial dos dados (como tipo de dados, normalização de dados nos campos, etc) e curadoria final dos dados (mais normalização e seleção dos dados visando a utilização pela área de negócio), respectivamente;
+    - no Banco de Dados/Data Mart é armanezado somente os dados já curados (curated data do Data Lake) para consumo em ferramentas de visualização (Power BI, Tableau, Metabase, etc) ou para utilização em ferramentas de Ciência de Dados (como Jupyter Notebook, Google Colab, etc) <br><br>
     
-### Modelagem Dimensional dos dados
-
-![alt text](https://github.com/cicerojmm/analiseDadosAbertosProvaBrasil/blob/master/images/modelagem-dimensional.png?raw=true)
-
-### Execução do Projeto
-O projeto está totalmente baseado no Docker e Docker Compose, basta seguir os passos abaixo:
-1. Executar imagem do Airflow: 
+Para executar o arquivo, abra o Shell/CMD e navegue até a pasta do projeto (caso ainda não esteja):
 ```sh
-$ docker-compose -f docker-compose-airflow.yml up -d
+$ python arquivo.py
 ```
-2. Executar imagem do Metabase: 
-```sh
-$ docker-compose -f docker-compose-metabase.yml up -d
-```
-2. Baixar os dados abertos: 
-```sh
-$ ./baixar_dados_abertos.sh
-```
-3. No painel web do Airflow cadastrar as connections do S3 com o nome *aws_s3* e do Redshift com o nome *aws_redshift*.
-4. Criar as tabelas necessárias no Redshift utilizando o script *criacao-tabelas-dw-redshift.sql* deste repositório.
-5. Criar um bucket no S3 e alterar o nome do bucket no código para o criado neste passo.
-5. Executar a pipeline de dados no airflow.
-6. Configurar e criar as visualizações no Metabase.
-
-### Fluxo Completo no Airflow
-![alt text](https://github.com/cicerojmm/analiseDadosAbertosProvaBrasil/blob/master/images/pipeline-completa-airflow.png?raw=true)
-
-### Dashboard gerado no Metabase
-![alt text](https://github.com/cicerojmm/analiseDadosAbertosProvaBrasil/blob/master/images/dashboard-metabase.png?raw=true)
