@@ -10,15 +10,15 @@ O processo apresentado aqui trata a extração de livros conforme termo/condiç�
         - awswrangler
         - boto3
 - Criar uma conta na AWS (caso ainda não tenha): https://aws.amazon.com/pt/;
-- Definir chaves de acesso no IAM Management na AWS (`ACCESS_KEY` e `SECRET_KEY`) e setar nas respectivas variáveis do arquivo **[arquivoPY](http://)**;
-- Criar um bucket no AWS S3 que será o Data Lake do projeto e setar na variável `bucket` do arquivo **[arquivoPY](http://)**
+- Definir chaves de acesso no IAM Management na AWS (`ACCESS_KEY` e `SECRET_KEY`) e setar nas respectivas variáveis do arquivo **[etl_gbooksAPI](https://github.com/contatolucas/data-eng/blob/master/etl-google-books-API/etl_gbooksAPI.py)**;
+- Criar um bucket no AWS S3 que será o Data Lake do projeto e setar na variável `bucket` do arquivo **[etl_gbooksAPI](https://github.com/contatolucas/data-eng/blob/master/etl-google-books-API/etl_gbooksAPI.py)**;
 - Criar uma instância PostgreSQL no AWS RDS (que permita conexão pública) que será o Banco de Dados/Data Mart do projeto e setar as configurações em `postgres_engine` do arquivo **[arquivoPY](http://)**;
 - Criar uma API Key (**[Criar chave de API](https://cloud.google.com/docs/authentication/api-keys?visit_id=637403001827530704-1456085297&rd=1#creating_an_api_key)**) <br>
 *os recursos da AWS utilizados aqui, contemplam o nível gratuito
 
 
 #### Iniciando
-Após definir e configurar os recursos acima na AWS, abra um client de Banco de Dados (DBeaver, pgAdmin, por exemplo), configure a conexão de acesso a instância PostgreSQL no RDS e rode as queries a seguir (também disponíveis no arquivo **[arquivoSQL](http://)**):
+Após definir e configurar os recursos acima na AWS, abra um client de Banco de Dados (DBeaver, pgAdmin, por exemplo), configure a conexão de acesso a instância PostgreSQL no RDS e rode as queries a seguir (também disponíveis no arquivo **[etl_gbooksAPI](https://github.com/contatolucas/data-eng/blob/master/etl-google-books-API/etl_gbooksAPI.py)**):
 ```sql
 -- cria usuario/role e atribui acesso admin ao mesmo
 CREATE ROLE user_etl WITH PASSWORD 'etl@2020' CREATEDB CREATEROLE LOGIN;
@@ -29,7 +29,7 @@ CREATE DATABASE db_gbooks OWNER user_etl TABLESPACE default;
 ```
 
 ### Executar ETL/ELT
-O arquivo principal do projeto **[arquivoPY](http://)** executará todo o processo de ETL/ELT consumindo os dados da API do Google Books, tratamento e carga no Data Lake (bucket do S3) e no Bando de Dados/Data Mart (PostreSQL no RDS). <br>
+O arquivo principal do projeto **[etl_gbooksAPI](https://github.com/contatolucas/data-eng/blob/master/etl-google-books-API/etl_gbooksAPI.py)** executará todo o processo de ETL/ELT consumindo os dados da API do Google Books, tratamento e carga no Data Lake (bucket do S3) e no Bando de Dados/Data Mart (PostreSQL no RDS). <br>
 Principais pontos do arquivo:
 - setar a condição/termo de busca na API em:
 ```py3
@@ -42,5 +42,5 @@ pesquisa = 'inpublisher:Saraiva+Educação'
     
 Para executar o arquivo, abra o Shell/CMD e navegue até a pasta do projeto (caso ainda não esteja):
 ```sh
-$ python arquivo.py
+$ python etl_gbooksAPI.py
 ```
