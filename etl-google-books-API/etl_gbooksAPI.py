@@ -8,8 +8,8 @@ from datetime import datetime
 
 
 #seta chaves de acesso na AWS
-ACCESS_KEY = 'AKIASJPPLPUVDBW7MXFD' # ACCESS_KEY unica por usuario (config em IAM Management Console na AWS)
-SECRET_KEY = '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' # SECRET_KEY unica por usuario (config em IAM Management Console na AWS)
+ACCESS_KEY = 'XXXXXXXXXXXXXXXX' # ACCESS_KEY unica por usuario (config em IAM Management Console na AWS)
+SECRET_KEY = 'xxXXXXXXXxxxxXXxXXXXXXX' # SECRET_KEY unica por usuario (config em IAM Management Console na AWS)
 
 # seta session na AWS
 session = boto3.Session(
@@ -24,16 +24,12 @@ bucket = 'data-lake-saraiva'
 # consultar o arquivo 'config_inicial_db.sql'
 postgres_engine = wr.db.get_engine(
     db_type="postgresql",
-    host="db-teste-saraiva.cpqbjokcgyjl.us-east-1.rds.amazonaws.com",
+    host="xxx.xxxxxxxx.us-east-1.rds.amazonaws.com",
     port=5432,
     database="db_gbooks",
     user="user_etl",
-    password="etl@2020"
+    password="xxxxxx"
 )
-
-dados_raw = 'C:/dados/raw/'
-dados_standard = 'C:/dados/standard/'
-dados_curated = 'C:/dados/curated/'
 
 # define variavel com o termo de busca
 # consultar documentacao GBooks API, na sessao: https://developers.google.com/books/docs/v1/using#query-params
@@ -43,7 +39,7 @@ pesquisa = 'inpublisher:Saraiva+Educação'
 class extrair_gbooksAPI():
     
     def __init__(self):
-        self.gAPIkey = 'AIzaSyB0lm2m8Zl81KXJcUgMgGIjNqBItpryxFQ' # Criar API Key na pag de APIs do Google
+        self.gAPIkey = 'xxXXXXXXXxxxxXXxXXXXXXX' # Criar API Key na pag de APIs do Google
         self.max_res = 40
     
     # funcao para extracao dos dados - json retorna no max 40 volumes/livros por requisao
@@ -89,7 +85,6 @@ df_raw = bk.busca(pesquisa)
 agora_raw = datetime.now().strftime("%Y%m%d%H%M%S")
 bucket_raw = f"s3://{bucket}/raw_data/gbooks_raw_Saraiva_Educacao_{agora_raw}.csv"
 wr.s3.to_csv(df_raw, bucket_raw, header=True, sep='|', index=False , encoding='utf-8')
-df_raw.to_csv(dados_raw+'gbooks_raw_Saraiva_Educacao_'+agora_raw+'.csv', header=True, sep='|', index=False , encoding='utf-8')
 
 
 # ::. ETL Google Books .::
@@ -167,7 +162,6 @@ df_standard = df_raw[df_list_standard]
 agora_standard = datetime.now().strftime("%Y%m%d%H%M%S")
 bucket_standard = f"s3://{bucket}/standard_data/gbooks_standard_Saraiva_Educacao_{agora_standard}.csv"
 wr.s3.to_csv(df_standard, bucket_standard, header=True, sep='|', index=False , encoding='utf-8', boto3_session=session)
-df_standard.to_csv(dados_standard+'gbooks_standard_Saraiva_Educacao_'+agora_standard+'.csv', header=True, sep='|', index=False , encoding='utf-8')
 
 
 # Cria base curated
@@ -225,7 +219,6 @@ df_curated['data_carga'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 agora_curated = datetime.now().strftime("%Y%m%d%H%M%S")
 bucket_curated = f"s3://{bucket}/curated_data/gbooks_curated_Saraiva_Educacao_{agora_curated}.csv"
 wr.s3.to_csv(df_curated, bucket_curated, header=True, sep='|', index=False , encoding='utf-8', boto3_session=session)
-df_curated.to_csv(dados_curated+'gbooks_curated_Saraiva_Educacao_'+agora_curated+'.csv', header=True, sep='|', index=False , encoding='utf-8')
 
 # cria a tabela 'tb_gbooks_curated' fazendo insert na mesma com os dados do 'df_curated'
 wr.db.to_sql(df_curated, postgres_engine, schema="public", name="tb_gbooks_curated", if_exists="replace", index=False)
