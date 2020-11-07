@@ -18,7 +18,7 @@ session = boto3.Session(
 )
 
 #bucket do S3 (IMPORTANTE: criar o bucket via Console na AWS ou via AWS CLI)
-bucket = 'data-lake-saraiva'
+bucket = 'data-lake'
 
 # seta engine do banco de dados (IMPORTANTE: criar a instancia via Console na AWS ou via AWS CLI)
 # consultar o arquivo 'config_inicial_db.sql'
