@@ -1,6 +1,6 @@
 # EXTRAÇÃO E CARGA DE DADOS DE LIVROS - GOOGLE BOOKS API
 
-Processo de extração, tratamento e carga de volumes (livros) dO **[Google Books API](https://developers.google.com/books)**.
+Processo de extração, tratamento e carga de volumes (livros) do **[Google Books API](https://developers.google.com/books)**.
 
 O processo apresentado aqui trata a extração de livros conforme termo/condições de pesquisa (**[Mais detalhes aqui](https://developers.google.com/books/docs/v1/using#query-params)**).
 
