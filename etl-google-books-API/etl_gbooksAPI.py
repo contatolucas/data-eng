@@ -170,6 +170,7 @@ wr.s3.to_csv(df_standard, bucket_standard, header=True, sep='|', index=False , e
 df_list_curated = {'id':'id_livro',
 'volumeInfo.title':'titulo',
 'volumeInfo.subtitle':'subtitulo',
+'Isbn13':'isbn13',
 'volumeInfo.authors':'autor',
 'volumeInfo.publishedDate':'data_publicacao',
 'anoPublicacao':'ano_publicacao',
