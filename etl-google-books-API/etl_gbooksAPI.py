@@ -8,8 +8,8 @@ from datetime import datetime
 
 
 #seta chaves de acesso na AWS
-ACCESS_KEY = 'XXXXXXXXXXXXXXXX' # ACCESS_KEY unica por usuario (config em IAM Management Console na AWS)
-SECRET_KEY = 'xxXXXXXXXxxxxXXxXXXXXXX' # SECRET_KEY unica por usuario (config em IAM Management Console na AWS)
+ACCESS_KEY = 'XXXXXXXXXXXXXXXXX' # ACCESS_KEY unica por usuario (config em IAM Management Console na AWS)
+SECRET_KEY = 'xxXXxxXXxxXXXXxXXXxXXxxxxXXXXX' # SECRET_KEY unica por usuario (config em IAM Management Console na AWS)
 
 # seta session na AWS
 session = boto3.Session(
@@ -18,17 +18,17 @@ session = boto3.Session(
 )
 
 #bucket do S3 (IMPORTANTE: criar o bucket via Console na AWS ou via AWS CLI)
-bucket = 'data-lake'
+bucket = 'data-lake-gbooks'
 
 # seta engine do banco de dados (IMPORTANTE: criar a instancia via Console na AWS ou via AWS CLI)
 # consultar o arquivo 'config_inicial_db.sql'
 postgres_engine = wr.db.get_engine(
     db_type="postgresql",
-    host="xxx.xxxxxxxx.us-east-1.rds.amazonaws.com",
+    host="xxxxxxx.xxxxxxxxx.us-east-1.rds.amazonaws.com",
     port=5432,
     database="db_gbooks",
-    user="user_etl",
-    password="xxxxxx"
+    user="usuario",
+    password="senha"
 )
 
 # define variavel com o termo de busca
@@ -36,34 +36,34 @@ postgres_engine = wr.db.get_engine(
 pesquisa = 'inpublisher:Saraiva+Educação'
 
 # class com as instrucoes de extracao da API do Google Books (formato json paginado)
-class extrair_gbooksAPI():
+class extrair_gbooks_API():
     
     def __init__(self):
-        self.gAPIkey = 'xxXXXXXXXxxxxXXxXXXXXXX' # Criar API Key na pag de APIs do Google
+        self.g_API_key = 'xxXXxxXXxxXXXXxXXXxXXxxxxXXXXX' # Criar API Key na pag de APIs do Google
         self.max_res = 40
     
     # funcao para extracao dos dados - json retorna no max 40 volumes/livros por requisao
     def busca(self, value):
-        par_total = {'q':value, 'key':self.gAPIkey}
+        par_total = {'q':value, 'key':self.g_API_key}
         r_total = requests.get(url="https://www.googleapis.com/books/v1/volumes", params=par_total)
         rjson_total = r_total.json()
-        varTotal = rjson_total['totalItems']        
+        var_Total = rjson_total['totalItems']        
         index_ini = 0
         count_reg = 0
         
         df = pd.DataFrame()
         
-        # loop armazena em df temporario os livros (de 40 em 40), ate atingir o total de livros (vide variavel 'varTotal')
-        while (count_reg < varTotal):
-            parms = {'q':value, 'maxResults':self.max_res, 'startIndex':index_ini, 'key':self.gAPIkey}
+        # loop armazena em df temporario os livros (de 40 em 40), ate atingir o total de livros (vide variavel 'var_Total')
+        while (count_reg < var_Total):
+            parms = {'q':value, 'maxResults':self.max_res, 'startIndex':index_ini, 'key':self.g_API_key}
             r = requests.get(url="https://www.googleapis.com/books/v1/volumes", params=parms)
             rjson = r.json()
             try:
-                rec = rjson["items"]
+                reg = rjson["items"]
             except:
                 break
             else:
-                df_temp = pd.json_normalize(rec)
+                df_temp = pd.json_normalize(reg)
                 df = pd.concat([df, df_temp], ignore_index=True)
                 df.reset_index()
 
@@ -73,18 +73,18 @@ class extrair_gbooksAPI():
         return df
 
 #instancia a class 'extrair_gbooksAP'
-bk = extrair_gbooksAPI()
+livros = extrair_gbooks_API()
 
 
 # Cria base raw
 
 # atribui o DataFrame de retorno da class/def em objeto para realizacao de ETL/ELT
-df_raw = bk.busca(pesquisa)
+df_raw = livros.busca(pesquisa)
 
 # exporta base com o resultado final bruto para consumo posterior, caso necessario (raw_data no Data Lake)
 agora_raw = datetime.now().strftime("%Y%m%d%H%M%S")
 bucket_raw = f"s3://{bucket}/raw_data/gbooks_raw_Saraiva_Educacao_{agora_raw}.csv"
-wr.s3.to_csv(df_raw, bucket_raw, header=True, sep='|', index=False , encoding='utf-8')
+wr.s3.to_csv(df_raw, bucket_raw, header=True, sep='|', index=False , encoding='utf-8', boto3_session=session)
 
 
 # ::. ETL Google Books .::
