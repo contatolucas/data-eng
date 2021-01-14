@@ -18,6 +18,8 @@ sudo apt-get update && sudo apt-get upgrade -y && sudo apt-get install -y python
 	 libpq-dev python-dev apt-transport-https ca-certificates curl gnupg-agent software-properties-common \
 	 git git-gui git-doc google-chrome-stable
 sudo snap install code --classic
+curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
+sudo apt-get update && sudo apt-get upgrade -y && sudo apt-get install -y nodejs
 echo -e "Apps instalados com sucesso!"
 
 
